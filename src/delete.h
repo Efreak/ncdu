@@ -31,7 +31,7 @@
 void delete_process(void);
 int  delete_key(int);
 void delete_draw(void);
-void delete_init(struct dir *, struct dir *);
+void delete_init(struct dir *, struct dir *, int clear);
 
 
 #endif

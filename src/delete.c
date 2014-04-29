@@ -38,16 +38,23 @@
 
 static struct dir *root, *nextsel, *curdir;
 static char noconfirm = 0, ignoreerr = 0, state, seloption;
-static int lasterrno;
+static int lasterrno, _clear = 0;
 
 
 static void delete_draw_confirm() {
-  nccreate(6, 60, "Confirm delete");
 
-  ncprint(1, 2, "Are you sure you want to delete \"%s\"%c",
+  if (_clear) {
+    nccreate(6, 60, "Confirm clear");
+    ncprint(1, 2, "Are you sure you want to clear \"%s\"%c",
     cropstr(root->name, 21), root->flags & FF_DIR ? ' ' : '?');
-  if(root->flags & FF_DIR)
-    ncprint(2, 18, "and all of its contents?");
+  } else {
+    nccreate(6, 60, "Confirm delete");
+    ncprint(1, 2, "Are you sure you want to delete \"%s\"%c",
+    cropstr(root->name, 21), root->flags & FF_DIR ? ' ' : '?');
+
+    if(root->flags & FF_DIR)
+      ncprint(2, 18, "and all of its contents?");
+  }
 
   if(seloption == 0)
     attron(A_REVERSE);
@@ -67,7 +74,10 @@ static void delete_draw_confirm() {
 
 
 static void delete_draw_progress() {
-  nccreate(6, 60, "Deleting...");
+  if (_clear)
+    nccreate(6, 60, "Clearing...");
+  else
+    nccreate(6, 60, "Deleting...");
 
   ncaddstr(1, 2, cropstr(getpath(curdir), 47));
   ncaddstr(4, 41, "Press q to abort");
@@ -77,7 +87,10 @@ static void delete_draw_progress() {
 static void delete_draw_error() {
   nccreate(6, 60, "Error!");
 
-  ncprint(1, 2, "Can't delete %s:", cropstr(getpath(curdir), 42));
+  if (_clear && root == curdir)
+    ncprint(1, 2, "Can't clear %s:", cropstr(getpath(curdir), 42));
+  else
+    ncprint(1, 2, "Can't delete %s:", cropstr(getpath(curdir), 42));
   ncaddstr(2, 4, strerror(lasterrno));
 
   if(seloption == 0)
@@ -187,7 +200,7 @@ static int delete_dir(struct dir *dr) {
     }
     if((r = chdir("..")) < 0)
       goto delete_nxt;
-    r = dr->sub == NULL ? rmdir(dr->name) : 0;
+    r = dr->sub == NULL && (!_clear || dr != root) ? rmdir(dr->name) : 0;
   } else
     r = unlink(dr->name);
 
@@ -200,7 +213,8 @@ delete_nxt:
     while(state == DS_FAILED)
       if(input_handle(0))
         return 1;
-  } else if(!(dr->flags & FF_DIR && dr->sub != NULL)) {
+  } else if( !(dr->flags & FF_DIR && dr->sub != NULL) 
+              && (!_clear || root != dr)) {
     freedir(dr);
     return 0;
   }
@@ -236,15 +250,16 @@ void delete_process() {
   if(nextsel)
     nextsel->flags |= FF_BSEL;
   browse_init(par);
-  if(nextsel)
+  if(!_clear && nextsel)
     dirlist_top(-4);
 }
 
 
-void delete_init(struct dir *dr, struct dir *s) {
+void delete_init(struct dir *dr, struct dir *s, int clear) {
   state = DS_CONFIRM;
   root = curdir = dr;
   pstate = ST_DEL;
   nextsel = s;
+  _clear = clear;
 }
 

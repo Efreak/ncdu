@@ -426,7 +426,22 @@ int browse_key(int ch) {
       if((t = dirlist_get(1)) == sel)
         if((t = dirlist_get(-1)) == sel || t == dirlist_parent)
           t = NULL;
-      delete_init(sel, t);
+      delete_init(sel, t, 0);
+      break;
+    case 'D':
+      if(read_only || dir_import_active) {
+        message = read_only
+          ? "Folder clearing disabled in read-only mode."
+          : "Folder clearing not available for imported directories.";
+        break;
+      }
+      if(sel == NULL || sel == dirlist_parent)
+        break;
+      if (!(sel->flags & FF_DIR)) {
+        message = "You can only clear folders";
+      }
+      info_show = 0;
+      delete_init(sel, t, 1);
       break;
     }
 
