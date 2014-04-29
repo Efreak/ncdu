@@ -180,6 +180,10 @@ Delete the selected file or directory. An error message will be shown when the
 contents of the directory do not match or do not exist anymore on the
 filesystem.
 
+=item D
+
+Clears the current directory, deleting all of its content.
+
 =item t
 
 Toggle dirs before files when sorting.

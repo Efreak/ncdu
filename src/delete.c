@@ -249,8 +249,11 @@ void delete_process() {
   delete_dir(root);
   if(nextsel)
     nextsel->flags |= FF_BSEL;
-  browse_init(par);
-  if(!_clear && nextsel)
+  if (_clear)
+    browse_init(root);
+  else
+    browse_init(par);
+  if(nextsel)
     dirlist_top(-4);
 }
 

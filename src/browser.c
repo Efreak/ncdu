@@ -435,13 +435,8 @@ int browse_key(int ch) {
           : "Folder clearing not available for imported directories.";
         break;
       }
-      if(sel == NULL || sel == dirlist_parent)
-        break;
-      if (!(sel->flags & FF_DIR)) {
-        message = "You can only clear folders";
-      }
       info_show = 0;
-      delete_init(sel, t, 1);
+      delete_init(dirlist_par, NULL, 1);
       break;
     }
 
