@@ -223,7 +223,7 @@ void delete_process() {
   seloption = 1;
   while(state == DS_CONFIRM && !noconfirm)
     if(input_handle(0)) {
-      browse_init(root->parent);
+      browse_init(clearing ? root : root->parent);
       return;
     }
 
