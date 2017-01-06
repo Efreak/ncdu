@@ -191,7 +191,8 @@ void dirlist_open(struct dir *d) {
 
   /* not necessary for any ncdu functionality,
    * but enables screen/tmux to work out our cwd */
-  chdir(getpath(dirlist_par));
+  if(!dir_import_active)
+    path_chdir(getpath(dirlist_par));
 
   /* set the head of the list */
   head_real = head = d == NULL ? NULL : d->sub;
