@@ -39,7 +39,7 @@ static char *message = NULL;
 static void browse_draw_info(struct dir *dr) {
   struct dir *t;
   struct dir_ext *e = dir_ext_ptr(dr);
-  char mbuf[46];
+  char mbuf[36];
   int i;
 
   nccreate(11, 60, "Item info");
@@ -72,10 +72,10 @@ static void browse_draw_info(struct dir *dr) {
 
     if(e) {
       ncaddstr(4, 9, fmtmode(e->mode));
-      ncprint(4, 26, "%d", e->uid);
-      ncprint(4, 38, "%d", e->gid);
+      ncprint(4, 16, "%d", e->uid);
+      ncprint(4, 28, "%d", e->gid);
       time_t t = (time_t)e->mtime;
-      strftime(mbuf, sizeof(mbuf), "%Y-%m-%d %H:%M:%S %z", localtime(&t));
+      strftime(mbuf, sizeof(mbuf), "%y-%m-%d %H:%M", localtime(&t));
       ncaddstr(5, 18, mbuf);
     }
 
@@ -198,7 +198,7 @@ static void browse_draw_items(struct dir *n, int *x) {
 
 static void browse_draw_mtime(struct dir *n, int *x) {
   enum ui_coltype c = n->flags & FF_BSEL ? UIC_SEL : UIC_DEFAULT;
-  char mbuf[26];
+  char mbuf[16];
   struct dir_ext *e;
   time_t t;
 
@@ -212,11 +212,11 @@ static void browse_draw_mtime(struct dir *n, int *x) {
   }
   t = (time_t)e->mtime;
 
-  strftime(mbuf, sizeof(mbuf), "%Y-%m-%d %H:%M:%S %z", localtime(&t));
+  strftime(mbuf, sizeof(mbuf), "%y-%m-%d %H:%M", localtime(&t));
   uic_set(c == UIC_SEL ? UIC_NUM_SEL : UIC_NUM);
 no_mtime:
-  printw("%26s", mbuf);
-  *x += 27;
+  printw("%16s", mbuf);
+  *x += 17;
 }
 
 
